@@ -1,0 +1,80 @@
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+.atom/
+.buildlog/
+.history
+.svn/
+migrate_working_dir/
+
+# IntelliJ related
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# The .vscode folder contains launch configuration and tasks you configure in
+# VS Code which you may wish to be included in version control, so this line
+# is commented out by default.
+#.vscode/
+
+# Flutter/Dart/Pub related
+**/doc/api/
+**/ios/Flutter/.last_build_id
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+/build/
+
+# Symbolication related
+app.*.symbols
+
+# Obfuscation related
+app.*.map.json
+
+# Android Studio will place build artifacts here
+/android/app/debug
+/android/app/profile
+/android/app/release
+
+# Test and coverage output
+/coverage/
+
+# Generated design exploration images
+/design-mockups/
+
+# Release packages and generated desktop artifacts
+/dist/
+/dist-custom/
+*.cwtheme
+*-report.json
+package-report.json
+ota_wallpaper.zip
+cadillac_ota_wallpaper.zip
+
+# Local packaging scratch/cache files
+**/__pycache__/
+*.py[cod]
+
+# Bundled template support. Only the football template below is intentionally
+# checked in; keep any other user-supplied template zips local.
+packager/templates/*.zip
+!packager/templates/BFA3A0F4596C4C57A6BCDC1EB3348932.zip
+!packager/templates/C59D070C944F434488DBB47F3A1856B4.zip
+!packager/templates/1DE01DE2BDE840B5B80A2CBA4069C63A.zip
+!packager/templates/9ADAF72DC26C4442A4FDA635FABCA348.zip
+!packager/templates/36DBC54BD479499FB8D3585D7A3CE184.zip
+!packager/templates/485EACC2AAC04B0291C769D74E938AE6.zip
+!packager/templates/README.md
+
+# Local-only resource overrides.
+packager/local/
+
+# Flutter generates this directory for each desktop platform.
+**/flutter/ephemeral/

@@ -1,0 +1,182 @@
+# Cadillac Wallpaper Desktop
+
+中文 | [English](README.md)
+
+这是一个 Flutter 桌面程序，用于把两张 JPG、JPEG 或 PNG 图片打包成 Cadillac 兼容的 OTA 壁纸包。输入尺寸不限，程序会居中裁切并生成原生 `8960x1320` KZB 主纹理；为获得最清晰效果，推荐输入 `8960x1320`（`224:33`）或更高的同宽高比图片。
+
+桌面端不会重新实现 KZB、ASTC、裁剪、alpha 或 dim-mask 规则。两个模式都复用同一个 Python CLI：`packager/cadillac_wallpaper_packager.py`，然后读取 `package-report.json` 并在界面中展示校验结果。
+
+> 这是非官方项目，与 General Motors、Cadillac 或相关商标持有人没有从属、赞助、背书或授权关系。详见 [DISCLAIMER.md](DISCLAIMER.md)。
+
+完整使用说明见 [docs/usage-zh-CN.md](docs/usage-zh-CN.md)。
+
+## 搜索关键词
+
+Cadillac 壁纸、凯迪拉克车机壁纸、凯迪拉克壁纸打包、车机 OTA 壁纸、Cadillac wallpaper packager、Flutter desktop、macOS、Windows、`.cwtheme`、Android 联动主题包、足球模板。
+
+## 当前版本
+
+当前源码版本为 `1.4.1+15`。Windows 可执行程序可在本仓库后续发布的
+[Releases](https://github.com/HermitKin/cadillac-wallpapaer/releases) 中下载；仓库首页的
+`Source code` 压缩包仅供开发使用，不能代替完整 Windows 发布包。
+
+## 功能
+
+- 标准 OTA 模式：选择白天和黑夜两张 JPG、JPEG 或 PNG 图片，输出 OTA zip 和对应的 report JSON。
+- 超清处理：`8960x1320` 输入采用原生尺寸直通；其他尺寸只进行一次高质量绘制。
+- 非破坏性裁切：载入完整原图后，可预览并调整整体缩放、宽度比例、高度比例、水平/垂直位置。
+- 自由旋转：支持 `-180°` 到 `180°`，数值可以直接输入，正角度为顺时针。
+- 手动数值输入：缩放、宽高比例、角度和位置都可直接输入，按回车或离开输入框后应用。
+- 最高画质编码：KZB 主纹理默认使用 ASTC `-exhaustive` 和照片感知优化。ASTC 8×8 是车机模板规定的固定有损纹理格式，因此无法逐像素无损，但程序不会再额外降低主图画质。
+- Android 联动主题包模式：选择白天/黑夜主图并填写主题信息，输出 `.cwtheme`，同时保存到桌面端本地主题库。
+- 基于 report 的校验展示：zip 完整性、PNG 尺寸/alpha、preview alpha 是否复用模板、KZB size、KZB record offset、`rec0`、透明 RGB 规则、KZB/VCD 拼接 MAE。
+- 支持 macOS 桌面构建，包括 Intel 和 Apple Silicon。
+- 支持 Windows x64 桌面构建。
+- 支持拖拽导入图片、进度日志、路径脱敏、打包后快速打开输出文件夹。
+- 内置并适配六套模板：`BFA3`、`C59D`、`1DE0`、`9ADA`、`36DB`、`485E`。
+
+## 主题包结构
+
+`.cwtheme` 文件内容如下：
+
+```text
+cwtheme/
+  manifest.json
+  previews/light_preview_2198x367.png
+  previews/dark_preview_2198x367.png
+  previews/thumbnail_light.png
+  previews/thumbnail_dark.png
+  masters/light_master_2198x367.png
+  masters/dark_master_2198x367.png
+  payload/ota_wallpaper.zip
+  report/package-report.json
+```
+
+## 内置模板和可选覆盖
+
+应用内置以下六套模板：
+
+```text
+BFA3A0F4596C4C57A6BCDC1EB3348932
+C59D070C944F434488DBB47F3A1856B4
+1DE01DE2BDE840B5B80A2CBA4069C63A
+9ADAF72DC26C4442A4FDA635FABCA348
+36DBC54BD479499FB8D3585D7A3CE184
+485EACC2AAC04B0291C769D74E938AE6
+```
+
+正常下载 release 后可以直接打包，不需要额外设置模板 zip。
+
+如果你要用自己的兼容模板包，可以通过环境变量覆盖内置模板：
+
+```bash
+export CADILLAC_INPUT_ZIP=/path/to/your/template.zip
+```
+
+可选覆盖项：
+
+```bash
+export CADILLAC_PYTHON=/path/to/python-with-pillow
+export CADILLAC_PACKAGER_SCRIPT=/path/to/cadillac_wallpaper_packager.py
+export CADILLAC_ASTCENC=/path/to/astcenc-or-astcenc.exe
+export CADILLAC_LIGHT_DIM_MASK=/path/to/light_dim_alpha_fixed_smoothed_used.png
+export CADILLAC_DARK_DIM_MASK=/path/to/dark_dim_alpha_fixed_smoothed_used.png
+```
+
+Windows 下可以在 `cmd.exe` 中使用 `set NAME=value`，或在 PowerShell 中使用 `$env:NAME="value"`。
+
+注意：不同原车包的 KZB record 映射可能不同。内置模板已经分别配置；通过
+`CADILLAC_INPUT_ZIP` 使用未知模板时，仍需先确认其图层结构。
+
+## 开发验证
+
+```bash
+flutter pub get
+flutter analyze
+flutter test --coverage
+```
+
+当前覆盖率目标是 80% 以上行覆盖率。
+
+## macOS 构建
+
+```bash
+flutter config --enable-macos-desktop
+flutter pub get
+flutter analyze
+flutter test
+flutter build macos --release
+```
+
+预期产物路径：
+
+```text
+build/macos/Build/Products/Release/cadillac_wallpaper_desktop.app
+```
+
+架构验证：
+
+```bash
+lipo -info build/macos/Build/Products/Release/cadillac_wallpaper_desktop.app/Contents/MacOS/cadillac_wallpaper_desktop
+```
+
+最终 macOS release 应同时包含 `x86_64` 和 `arm64`。
+
+## Windows x64 构建
+
+在 Windows x64 主机上运行：
+
+```powershell
+flutter config --enable-windows-desktop
+flutter pub get
+flutter analyze
+flutter test --coverage
+flutter build windows --release
+```
+
+预期 Windows 产物目录：
+
+```text
+build\windows\x64\runner\Release\
+```
+
+预期可执行文件：
+
+```text
+build\windows\x64\runner\Release\cadillac_wallpaper_desktop.exe
+```
+
+Windows 验证命令：
+
+```powershell
+Test-Path build\windows\x64\runner\Release\cadillac_wallpaper_desktop.exe
+Get-Item build\windows\x64\runner\Release\cadillac_wallpaper_desktop.exe
+```
+
+## Windows 一键构建包
+
+在 macOS 或 Linux 上创建 Windows 构建包：
+
+```bash
+scripts/make_windows_build_kit.sh
+```
+
+把 `dist/CadillacPackager-windows-build-kit.zip` 复制到 Windows x64 机器，解压后右键 `build_windows_one_click.cmd`，选择“以管理员身份运行”。最终 release 包会生成在：
+
+```text
+dist\CadillacPackager-windows-x64.zip
+```
+
+Windows 构建包会包含当前支持的足球模板。复制到 Windows 机器后，打包出的 app 默认也可以直接使用该内置模板。
+
+## 一起完善
+
+这个项目会继续围绕 Cadillac 车机壁纸做一套开源、免费的工具。目前已经有壁纸打包程序；壁纸安装程序也在开发中，但还属于未充分测试的半成品。
+
+我想寻找志同道合的车友一起把这个软件系列完善下去。如果你愿意测试不同车型和系统版本、提出功能与体验建议，或者帮忙做教程、帖子、视频等自媒体传播，欢迎扫码联系。所有后续工具都会保持开源和免费。
+
+<img src="docs/assets/wechat-contact.png" alt="微信联系方式" width="240">
+
+欢迎基于开源精神进行学习、交流、二次开发和提交改进，但抵制任何抄袭开源项目、换壳包装后拿去盈利的行为。这个系列会坚持开源免费，也希望参与者尊重每一份公开分享的劳动。
+
+禁止偷电
